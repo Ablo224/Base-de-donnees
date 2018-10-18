@@ -1,0 +1,28 @@
+les requêtes sql TD1:
+
+2-SELECT e.prenom,e.nom FROM employe e,infirmier i WHERE i.rotation = "NUIT" AND i.numero = e.numero
+
+3-SELECT service.nom,service.batiment,employe.prenom,employe.nom,docteur.specialite FROM docteur,employe,service WHERE employe.numero = docteur.numero AND service.directeur = docteur.numero
+
+4-SELECT h.lit,h.no_malade,h.no_chambre,s.nom,m.nom,m.prenom,m.mututuelle
+	FROM hospitalisation h,malade m, service s 
+	WHERE s.batiment LIKE 'B%'
+	AND h.no_malade = m.numero AND s.code = h.code_service AND m.mutuelle LIKE 'MN%'
+	
+6-SELECT s.code,AVG(c.nb_lits) AS nblits
+	FROM service s,chambre c
+	WHERE s.code = c.code_service AND s.batiment LIKE 'A'
+	GROUP BY s.code
+5-SELECT s.code AS code_service, CAST(AVG(i.salaire)) AS Moyenne_Salaire
+
+FROM service s, infirmier i
+WHERE s.code = i.code_service 
+GROUP BY s.code
+
+7-SELECT m.nom,m.prenom, COUNT(DISTINCT d.specialite) AS nb_specialites, COUNT(DISTINCT s.no_docteur) AS nb_soignants
+	FROM malade m, docteur d,soigne s
+	WHERE d.numero = s.no_docteur AND m.numero = s.no_malade
+	GROUP BY m.nom,m.prenom 
+	HAVING nb_soignants > 3 | HAVING COUNT (DISTINCT) d.numero) > 3
+8-SELECT s.nom, (SELECT COUNT(*) FROM infirmier i WHERE i.code_service = s.code)/(SELECT COUNT(*) FROM hospitalisation h WHERE h.code_service = s.code) AS rapport_i_sur_m
+	FROM service s
