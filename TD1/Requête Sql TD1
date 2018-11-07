@@ -26,3 +26,54 @@ GROUP BY s.code
 	HAVING nb_soignants > 3 | HAVING COUNT (DISTINCT) d.numero) > 3
 8-SELECT s.nom, (SELECT COUNT(*) FROM infirmier i WHERE i.code_service = s.code)/(SELECT COUNT(*) FROM hospitalisation h WHERE h.code_service = s.code) AS rapport_i_sur_m
 	FROM service s
+10-SELECT e.prenom, e.nom
+	FROM employe e,docteur d 
+	WHERE e.numero = d.numero 
+	AND e.numero NOT IN(
+		SELECT s.no_docteur
+		FROM soigne s,hospitalisation h
+		WHERE s.no_malade = h.no_malade)
+	GROUP BY e.nom
+11-SELECT e.prenom,e.nom, COUNT(so.no_malade) AS 'count(*)'
+	FROM employe e,soigne so, hospitalisation h
+	WHERE e.numero = so.no_docteur
+	AND (h.no_malade = so.no_malade)
+	GROUP BY e.nom
+	UNION 
+	SELECT e.prenom, e.nom,0
+		FROM employe e,docteur d 
+		WHERE e.numero = d.numero 
+		AND e.numero NOT IN(
+			SELECT s.no_docteur
+			FROM soigne s,hospitalisation h
+			WHERE s.no_malade = h.no_malade) 
+	GROUP BY e.nom
+12-SELECT DISTINCT s.batiment,c.no_chambre
+	FROM service s,chambre c,hospitalisation h
+	WHERE s.code = c.code_service 
+	AND h.code_service = c.code_service
+	
+13-SELECT DISTINCT s.batiment,c.no_chambre
+	FROM service s,chambre c
+	WHERE s.code = c.code_service
+	AND c.no_chambre NOT IN
+		(SELECT  h.no_chambre
+		FROM hospitalisation h
+		WHERE h.code_service = c.code_service)
+13bis-SELECT DISTINCT s.batiment,c.no_chambre
+	FROM service s,chambre c
+	WHERE c.code_service = s.code 
+	AND (c.code_service,c.no_chambre)
+	NOT IN (select h.code_service,h.no_chambre
+			FROM hospitalisation hospitalisation
+		   )
+15-SELECT DISTINCT e.prenom,e.nom
+	FROM employe e,hospitalisation h,soigne so
+	WHERE e.numero = so.no_docteur 
+		AND h.no_malade = so.no_malade
+	GROUP BY e.nom,e.prenom
+	HAVING COUNT(DISTINCT h.code_service)=
+	(
+		SELECT COUNT(*)
+		FROM service
+	)
